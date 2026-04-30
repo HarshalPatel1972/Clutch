@@ -130,9 +130,9 @@ fn main() {
     
     // Initial positioning
     {
-        let state = state.lock().unwrap();
-        let mut x = state.config.pill_position.x;
-        let mut y = state.config.pill_position.y;
+        let state_guard = state.lock().unwrap();
+        let mut x = state_guard.config.pill_position.x;
+        let mut y = state_guard.config.pill_position.y;
         
         if x == -1 || y == -1 {
             // Default: Right edge, centered vertically
@@ -152,7 +152,25 @@ fn main() {
         window::setup_window(hwnd);
     }
 
+    // Initialize Polish bits
+    let _tray = tray::create_tray();
+    window::enable_autostart();
+    trigger_startup_animation(window.clone_strong());
+
+    // Listen for tray events (polling)
+    slint::Timer::single_shot(std::time::Duration::from_millis(500), || {
+        // Just a placeholder to show we can poll tray-icon event receiver
+    });
+
     window.run().unwrap();
+}
+
+mod tray;
+
+fn trigger_startup_animation(window: MainWindow) {
+    slint::Timer::single_shot(std::time::Duration::from_millis(100), move || {
+        window.set_started(true);
+    });
 }
 
 fn refresh_packages_and_panel(window: &MainWindow, state: &state::AppState) {

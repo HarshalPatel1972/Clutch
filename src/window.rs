@@ -29,3 +29,41 @@ pub fn setup_window(hwnd: HWND) {
         );
     }
 }
+
+pub fn enable_autostart() {
+    use windows::Win32::System::Registry::*;
+    use windows::core::HSTRING;
+    
+    unsafe {
+        let mut hkey = HKEY::default();
+        let subkey = HSTRING::from("Software\\Microsoft\\Windows\\CurrentVersion\\Run");
+        
+        if RegOpenKeyExW(
+            HKEY_CURRENT_USER,
+            &subkey,
+            0,
+            KEY_WRITE,
+            &mut hkey
+        ).is_ok() {
+            let exe_path = std::env::current_exe().unwrap();
+            let path_str = HSTRING::from(exe_path.to_str().unwrap());
+            let path_wide = path_str.as_wide();
+            let data = unsafe { 
+                std::slice::from_raw_parts(
+                    path_wide.as_ptr() as *const u8,
+                    path_wide.len() * 2
+                )
+            };
+            
+            let _ = RegSetValueExW(
+                hkey,
+                &HSTRING::from("Clutch"),
+                0,
+                REG_SZ,
+                Some(data)
+            );
+            
+            let _ = RegCloseKey(hkey);
+        }
+    }
+}

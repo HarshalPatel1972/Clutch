@@ -15,6 +15,7 @@ export component MainWindow inherits Window {
     height: 600px;
 
     // --- Properties exposed to Rust ---
+    in property <bool> started: false;
     in property <[PackageData]> packages: [];
     in property <string> expanded-id: "";
     in property <string> expanded-name: "";
@@ -32,8 +33,13 @@ export component MainWindow inherits Window {
 
     // --- The pill dock (right side) ---
     Pill {
-        x: parent.width - self.width - 4px;
+        x: started ? parent.width - self.width - 4px : parent.width + 10px;
         y: (parent.height - self.height) / 2;
+        
+        animate x {
+            duration: 400ms;
+            easing: cubic-bezier(0.16, 1, 0.3, 1);
+        }
         packages: root.packages;
         expanded-id: root.expanded-id;
 

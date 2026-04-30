@@ -145,13 +145,24 @@ export component ExpandedPanel inherits Rectangle {
                     }
 
                     // Name
-                    Text {
-                        text: item.name;
-                        color: item.exists ? #F0EDE8 : #5A5750;
-                        font-size: 13px;
-                        vertical-alignment: center;
+                    Rectangle {
                         horizontal-stretch: 1;
-                        overflow: elide;
+                        Text {
+                            text: item.name;
+                            color: item.exists ? #F0EDE8 : #5A5750;
+                            font-size: 13px;
+                            vertical-alignment: center;
+                            overflow: elide;
+                            width: parent.width;
+                        }
+                        
+                        // Strikethrough for missing items
+                        if !item.exists : Rectangle {
+                            height: 1px;
+                            width: parent.width;
+                            y: (parent.height - 1px) / 2;
+                            background: #5A5750;
+                        }
                     }
 
                     // Missing indicator
