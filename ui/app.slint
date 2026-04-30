@@ -27,6 +27,7 @@ export component MainWindow inherits Window {
     callback item-opened(string);
     callback item-right-clicked(string);
     callback add_item_clicked(string); // package_id
+    callback drag-moved(length, length);
     callback panel-closed();
 
     // --- The pill dock (right side) ---
@@ -40,6 +41,7 @@ export component MainWindow inherits Window {
         package-right-clicked(id) => { root.package-right-clicked(id); }
         item-opened(path) => { root.item-opened(path); }
         item-right-clicked(path) => { root.item-right-clicked(path); }
+        drag-moved(dx, dy) => { root.drag-moved(dx, dy); }
     }
 
     // --- Expanded panel (appears to the left of pill) ---

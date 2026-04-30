@@ -107,8 +107,45 @@ fn main() {
         }
     });
 
+    // --- Handle drag moved ---
+    let window_weak = window.as_weak();
+    let state_clone = state.clone();
+    window.on_drag_moved(move |dx, dy| {
+        if let Some(window) = window_weak.upgrade() {
+            let pos = window.window().position();
+            let new_x = pos.x + dx as i32;
+            let new_y = pos.y + dy as i32;
+            window.window().set_position(slint::PhysicalPosition::new(new_x, new_y));
+            
+            // Save to config
+            let mut state = state_clone.lock().unwrap();
+            state.config.pill_position.x = new_x;
+            state.config.pill_position.y = new_y;
+            state.config.save();
+        }
+    });
+
     // Show window and setup native bits
     window.show().unwrap();
+    
+    // Initial positioning
+    {
+        let state = state.lock().unwrap();
+        let mut x = state.config.pill_position.x;
+        let mut y = state.config.pill_position.y;
+        
+        if x == -1 || y == -1 {
+            // Default: Right edge, centered vertically
+            unsafe {
+                let screen_width = windows::Win32::UI::WindowsAndMessaging::GetSystemMetrics(windows::Win32::UI::WindowsAndMessaging::SM_CXSCREEN);
+                let screen_height = windows::Win32::UI::WindowsAndMessaging::GetSystemMetrics(windows::Win32::UI::WindowsAndMessaging::SM_CYSCREEN);
+                
+                x = screen_width - 360 - 20; // 360 is window width
+                y = (screen_height - 600) / 2;
+            }
+        }
+        window.window().set_position(slint::PhysicalPosition::new(x, y));
+    }
     
     // Trap 3: Setup window AFTER show
     if let Some(hwnd) = get_hwnd(&window) {

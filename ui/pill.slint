@@ -20,10 +20,11 @@ export component Pill inherits Rectangle {
     callback package-right-clicked(string);    // package id
     callback item-opened(string);              // file path
     callback item-right-clicked(string);       // file path
+    callback drag-moved(length, length);       // delta-x, delta-y
 
     // --- Size ---
     width: 68px;
-    height: packages.length * 58px + 24px;
+    height: packages.length * 58px + 80px; // extra space for add btn and drag handle
 
     // --- Visual ---
     background: rgba(18, 18, 24, 0.92);
@@ -34,6 +35,16 @@ export component Pill inherits Rectangle {
     drop-shadow-color: rgba(0, 0, 0, 0.55);
     drop-shadow-offset-x: -4px;
     drop-shadow-offset-y: 8px;
+
+    // --- Drag Handle / Background ---
+    TouchArea {
+        mouse-cursor: move;
+        moved => {
+            if self.pressed {
+                root.drag-moved(self.mouse-x - self.pressed-x, self.mouse-y - self.pressed-y);
+            }
+        }
+    }
 
     // --- Cards ---
     VerticalLayout {
