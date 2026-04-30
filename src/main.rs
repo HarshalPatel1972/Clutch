@@ -1,4 +1,7 @@
 // src/main.rs
+mod config;
+mod state;
+
 slint::slint! {
     export component MainWindow inherits Window {
         width: 200px;
