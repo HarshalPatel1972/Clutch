@@ -1,1 +1,54 @@
-// ui/app.slint placeholder
+// ui/app.slint
+import { Pill, PackageData } from "pill.slint";
+import { ExpandedPanel, ItemData } from "panel.slint";
+
+export component MainWindow inherits Window {
+    // No frame, transparent — the pill floats over desktop
+    no-frame: true;
+    background: transparent;
+
+    // Window size — fits the pill + panel space
+    width: 360px;
+    height: 600px;
+
+    // --- Properties exposed to Rust ---
+    in property <[PackageData]> packages: [];
+    in property <string> expanded-id: "";
+    in property <string> expanded-name: "";
+    in property <string> expanded-color: "#A8E6A3";
+    in property <[ItemData]> expanded-items: [];
+
+    // --- Callbacks exposed to Rust ---
+    callback package-clicked(string);
+    callback package-right-clicked(string);
+    callback item-opened(string);
+    callback item-right-clicked(string);
+    callback panel-closed();
+
+    // --- The pill dock (right side) ---
+    Pill {
+        x: parent.width - self.width - 4px;
+        y: (parent.height - self.height) / 2;
+        packages: root.packages;
+        expanded-id: root.expanded-id;
+
+        package-clicked(id) => { root.package-clicked(id); }
+        package-right-clicked(id) => { root.package-right-clicked(id); }
+        item-opened(path) => { root.item-opened(path); }
+        item-right-clicked(path) => { root.item-right-clicked(path); }
+    }
+
+    // --- Expanded panel (appears to the left of pill) ---
+    ExpandedPanel {
+        x: 4px;
+        y: (parent.height - self.height) / 2;
+        package-name: root.expanded-name;
+        package-color: root.expanded-color;
+        items: root.expanded-items;
+        visible-state: root.expanded-id != "";
+
+        item-clicked(path) => { root.item-opened(path); }
+        item-right-clicked(path) => { root.item-right-clicked(path); }
+        close-panel => { root.panel-closed(); }
+    }
+}

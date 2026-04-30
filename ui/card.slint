@@ -1,1 +1,84 @@
-// ui/card.slint placeholder
+// ui/card.slint
+export component Card inherits Rectangle {
+    // --- Properties ---
+    in property <string> card-name: "Package";
+    in property <string> card-color: "#A8E6A3";
+    in property <int> item-count: 0;
+    in property <bool> is-expanded: false;
+
+    // --- Callbacks ---
+    callback clicked();
+    callback right-clicked();
+
+    // --- Size with spring animation ---
+    width: touch.has-hover ? 54px : 48px;
+    height: touch.has-hover ? 54px : 48px;
+
+    animate width {
+        duration: 200ms;
+        easing: cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    animate height {
+        duration: 200ms;
+        easing: cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    // --- Visual ---
+    background: @linear-gradient(145deg,
+        Colors.from-argb-encoded(card-color.to-argb()),
+        Colors.from-argb-encoded(card-color.to-argb()).darker(0.15)
+    );
+    border-radius: 12px;
+    border-width: is-expanded ? 2px : 1px;
+    border-color: is-expanded
+        ? Colors.white.with-alpha(0.6)
+        : Colors.white.with-alpha(0.2);
+
+    drop-shadow-blur: touch.has-hover ? 12px : 6px;
+    drop-shadow-color: Colors.black.with-alpha(0.4);
+    drop-shadow-offset-y: touch.has-hover ? 6px : 3px;
+
+    animate drop-shadow-blur {
+        duration: 200ms;
+        easing: ease-out;
+    }
+
+    // --- Item count badge ---
+    if item-count > 0 : Rectangle {
+        x: parent.width - 14px;
+        y: -4px;
+        width: 18px;
+        height: 18px;
+        border-radius: 9px;
+        background: Colors.white.with-alpha(0.9);
+
+        Text {
+            text: item-count > 9 ? "9+" : item-count;
+            color: #333333;
+            font-size: 9px;
+            font-weight: 700;
+            horizontal-alignment: center;
+            vertical-alignment: center;
+        }
+    }
+
+    // --- Active indicator dot ---
+    if is-expanded : Rectangle {
+        x: (parent.width - 6px) / 2;
+        y: parent.height + 4px;
+        width: 6px;
+        height: 6px;
+        border-radius: 3px;
+        background: Colors.white.with-alpha(0.8);
+    }
+
+    // --- Touch area ---
+    touch := TouchArea {
+        clicked => { root.clicked(); }
+        pointer-event(event) => {
+            if event.button == PointerEventButton.right {
+                root.right-clicked();
+            }
+        }
+    }
+}

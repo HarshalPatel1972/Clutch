@@ -1,1 +1,86 @@
-// ui/pill.slint placeholder
+// ui/pill.slint
+import { Card } from "card.slint";
+import { ExpandedPanel, ItemData } from "panel.slint";
+
+export struct PackageData {
+    id: string,
+    name: string,
+    color: string,
+    item-count: int,
+    items: [ItemData],
+}
+
+export component Pill inherits Rectangle {
+    // --- Properties ---
+    in property <[PackageData]> packages: [];
+    in property <string> expanded-id: "";
+
+    // --- Callbacks ---
+    callback package-clicked(string);          // package id
+    callback package-right-clicked(string);    // package id
+    callback item-opened(string);              // file path
+    callback item-right-clicked(string);       // file path
+
+    // --- Size ---
+    width: 68px;
+    height: packages.length * 58px + 24px;
+
+    // --- Visual ---
+    background: rgba(18, 18, 24, 0.92);
+    border-radius: 22px;
+    border-width: 1px;
+    border-color: rgba(255, 255, 255, 0.10);
+    drop-shadow-blur: 28px;
+    drop-shadow-color: rgba(0, 0, 0, 0.55);
+    drop-shadow-offset-x: -4px;
+    drop-shadow-offset-y: 8px;
+
+    // --- Cards ---
+    VerticalLayout {
+        padding: 12px;
+        spacing: 8px;
+        alignment: center;
+
+        for pkg in packages : Card {
+            card-name: pkg.name;
+            card-color: pkg.color;
+            item-count: pkg.item-count;
+            is-expanded: root.expanded-id == pkg.id;
+
+            clicked => { root.package-clicked(pkg.id); }
+            right-clicked => { root.package-right-clicked(pkg.id); }
+        }
+
+        // Add package button
+        add-btn := Rectangle {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            border-width: 1px;
+            border-color: rgba(255, 255, 255, 0.12);
+            background: add-touch.has-hover
+                ? rgba(255, 255, 255, 0.08)
+                : rgba(255, 255, 255, 0.04);
+
+            Text {
+                text: "+";
+                color: #8E8B82;
+                font-size: 20px;
+                horizontal-alignment: center;
+                vertical-alignment: center;
+            }
+
+            add-touch := TouchArea {
+                clicked => {
+                    // Signal Rust to show add package dialog
+                    root.package-clicked("__add__");
+                }
+            }
+
+            animate background {
+                duration: 150ms;
+                easing: ease-out;
+            }
+        }
+    }
+}

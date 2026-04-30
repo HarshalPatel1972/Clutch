@@ -1,1 +1,207 @@
-// ui/panel.slint placeholder
+// ui/panel.slint
+import { VerticalBox } from "std-widgets.slint";
+
+export struct ItemData {
+    name: string,
+    path: string,
+    is-folder: bool,
+    exists: bool,
+}
+
+export component ExpandedPanel inherits Rectangle {
+    // --- Properties ---
+    in property <string> package-name: "Package";
+    in property <string> package-color: "#A8E6A3";
+    in property <[ItemData]> items: [];
+    in property <bool> visible-state: false;
+
+    // --- Callbacks ---
+    callback item-clicked(string);        // path
+    callback item-right-clicked(string);  // path
+    callback close-panel();
+
+    // --- Size ---
+    width: 280px;
+    min-height: 80px;
+
+    // --- Animations ---
+    opacity: visible-state ? 1.0 : 0.0;
+    x: visible-state ? -290px : -260px;  // slides in from right
+
+    animate opacity {
+        duration: 200ms;
+        easing: ease-out;
+    }
+    animate x {
+        duration: 280ms;
+        easing: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    // --- Background ---
+    background: rgba(18, 18, 26, 0.96);
+    border-radius: 16px;
+    border-width: 1px;
+    border-color: rgba(255, 255, 255, 0.10);
+    drop-shadow-blur: 32px;
+    drop-shadow-color: rgba(0, 0, 0, 0.6);
+    drop-shadow-offset-x: -4px;
+
+    VerticalLayout {
+        padding: 14px;
+        spacing: 8px;
+
+        // --- Panel header ---
+        HorizontalLayout {
+            spacing: 8px;
+            alignment: center;
+
+            // Color dot
+            Rectangle {
+                width: 10px;
+                height: 10px;
+                border-radius: 5px;
+                background: Colors.from-argb-encoded(package-color.to-argb());
+            }
+
+            // Package name
+            Text {
+                text: package-name;
+                color: #F0EDE8;
+                font-size: 13px;
+                font-weight: 600;
+                vertical-alignment: center;
+                horizontal-stretch: 1;
+            }
+
+            // Close button
+            close-btn := Rectangle {
+                width: 22px;
+                height: 22px;
+                border-radius: 11px;
+                background: close-touch.has-hover
+                    ? rgba(255, 255, 255, 0.15)
+                    : transparent;
+
+                Text {
+                    text: "×";
+                    color: #8E8B82;
+                    font-size: 16px;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                }
+
+                close-touch := TouchArea {
+                    clicked => { root.close-panel(); }
+                }
+
+                animate background {
+                    duration: 120ms;
+                    easing: ease-out;
+                }
+            }
+        }
+
+        // --- Divider ---
+        Rectangle {
+            height: 1px;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        // --- Items list ---
+        if items.length == 0 : Text {
+            text: "Drop items here\nor right-click to add";
+            color: #5A5750;
+            font-size: 12px;
+            horizontal-alignment: center;
+            wrap: word-wrap;
+        }
+
+        for item in items : item-row := HorizontalLayout {
+            spacing: 10px;
+            padding-left: 4px;
+            padding-right: 4px;
+
+            item-bg := Rectangle {
+                border-radius: 8px;
+                background: item-touch.has-hover
+                    ? rgba(255, 255, 255, 0.08)
+                    : transparent;
+                padding: 8px;
+
+                animate background {
+                    duration: 120ms;
+                    easing: ease-out;
+                }
+
+                HorizontalLayout {
+                    spacing: 10px;
+                    alignment: center;
+
+                    // Icon
+                    Text {
+                        text: item.is-folder ? "📁" : "📄";
+                        font-size: 16px;
+                        vertical-alignment: center;
+                    }
+
+                    // Name
+                    Text {
+                        text: item.name;
+                        color: item.exists ? #F0EDE8 : #5A5750;
+                        font-size: 13px;
+                        vertical-alignment: center;
+                        horizontal-stretch: 1;
+                        overflow: elide;
+                    }
+
+                    // Missing indicator
+                    if !item.exists : Text {
+                        text: "✕";
+                        color: #F4A896;
+                        font-size: 11px;
+                        vertical-alignment: center;
+                    }
+                }
+
+                item-touch := TouchArea {
+                    clicked => {
+                        if item.exists {
+                            root.item-clicked(item.path);
+                        }
+                    }
+                    pointer-event(event) => {
+                        if event.button == PointerEventButton.right {
+                            root.item-right-clicked(item.path);
+                        }
+                    }
+                }
+            }
+        }
+
+        // --- Add item hint ---
+        Rectangle {
+            height: 32px;
+            border-radius: 8px;
+            border-width: 1px;
+            border-color: rgba(255, 255, 255, 0.08);
+            background: add-touch.has-hover
+                ? rgba(255, 255, 255, 0.05)
+                : transparent;
+
+            Text {
+                text: "+ Add from Desktop";
+                color: #5A5750;
+                font-size: 11px;
+                horizontal-alignment: center;
+                vertical-alignment: center;
+            }
+
+            add-touch := TouchArea {}
+
+            animate background {
+                duration: 120ms;
+                easing: ease-out;
+            }
+        }
+    }
+}
