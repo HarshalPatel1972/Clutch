@@ -25,6 +25,9 @@ serde_json = "1"
 # Tray icon
 tray-icon = "0.16"
 
+# Slint backend for native window access
+i-slint-backend-winit = "1.9"
+
 # File watching — detect desktop changes
 notify = "6"
 

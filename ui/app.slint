@@ -15,7 +15,7 @@ export component MainWindow inherits Window {
     in property <[PackageData]> packages: [];
     in property <string> expanded-id: "";
     in property <string> expanded-name: "";
-    in property <string> expanded-color: "#A8E6A3";
+    in property <color> expanded-color: #A8E6A3; // Changed to color type
     in property <[ItemData]> expanded-items: [];
 
     // --- Callbacks exposed to Rust ---

@@ -856,6 +856,7 @@ name = "clutch"
 version = "1.0.0"
 dependencies = [
  "directories",
+ "i-slint-backend-winit",
  "notify",
  "open",
  "serde",

@@ -5,7 +5,7 @@ import { ExpandedPanel, ItemData } from "panel.slint";
 export struct PackageData {
     id: string,
     name: string,
-    color: string,
+    color: color, // Changed to color type
     item-count: int,
     items: [ItemData],
 }
