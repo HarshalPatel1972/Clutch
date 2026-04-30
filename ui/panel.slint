@@ -196,7 +196,9 @@ export component ExpandedPanel inherits Rectangle {
                 vertical-alignment: center;
             }
 
-            add-touch := TouchArea {}
+            add-touch := TouchArea {
+                clicked => { root.item-right-clicked("__add_item__"); } // Using existing callback for now or better, use a new one
+            }
 
             animate background {
                 duration: 120ms;

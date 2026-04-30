@@ -1,0 +1,59 @@
+// ui/picker.slint
+export struct DesktopItem {
+    name: string,
+    path: string,
+    is-folder: bool,
+}
+
+export component DesktopPicker inherits Dialog {
+    title: "Add to Package";
+    width: 320px;
+    height: 400px;
+
+    in property <[DesktopItem]> desktop-items: [];
+    callback item-selected(string);  // path
+
+    VerticalLayout {
+        padding: 16px;
+        spacing: 8px;
+
+        Text {
+            text: "Choose from Desktop:";
+            color: #F0EDE8;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        StandardListView := VerticalLayout {
+            spacing: 4px;
+            for item in desktop-items : Rectangle {
+                height: 40px;
+                background: touch.has-hover ? rgba(255, 255, 255, 0.1) : transparent;
+                border-radius: 4px;
+
+                HorizontalLayout {
+                    padding: 8px;
+                    spacing: 10px;
+
+                    Text {
+                        text: item.is-folder ? "📁" : "📄";
+                        font-size: 16px;
+                    }
+
+                    Text {
+                        text: item.name;
+                        color: #F0EDE8;
+                        font-size: 13px;
+                        vertical-alignment: center;
+                        horizontal-stretch: 1;
+                        overflow: elide;
+                    }
+                }
+
+                touch := TouchArea {
+                    clicked => { root.item-selected(item.path); }
+                }
+            }
+        }
+    }
+}

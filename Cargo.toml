@@ -5,13 +5,14 @@ edition = "2021"
 
 [dependencies]
 # Slint — GPU-accelerated UI framework
-slint = "1.9"
+slint = { version = "1.9", features = ["raw-window-handle-06"] }
 
 # Windows API — for file operations, window management
 [target.'cfg(windows)'.dependencies]
 windows = { version = "0.58", features = [
     "Win32_UI_Shell",           # SHOpenFolderAndSelectItems
     "Win32_UI_WindowsAndMessaging", # SetWindowPos, always on top
+    "Win32_UI_Input_KeyboardAndMouse",
     "Win32_Foundation",         # HWND, BOOL, RECT
     "Win32_Graphics_Gdi",       # screen dimensions
     "Win32_System_Threading",   # background threads
@@ -27,6 +28,7 @@ tray-icon = "0.16"
 
 # Slint backend for native window access
 i-slint-backend-winit = "1.9"
+raw-window-handle = "0.6"
 
 # File watching — detect desktop changes
 notify = "6"

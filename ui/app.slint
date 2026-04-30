@@ -1,6 +1,9 @@
 // ui/app.slint
 import { Pill, PackageData } from "pill.slint";
 import { ExpandedPanel, ItemData } from "panel.slint";
+import { DesktopPicker, DesktopItem } from "picker.slint";
+
+export { DesktopPicker, DesktopItem }
 
 export component MainWindow inherits Window {
     // No frame, transparent — the pill floats over desktop
@@ -23,6 +26,7 @@ export component MainWindow inherits Window {
     callback package-right-clicked(string);
     callback item-opened(string);
     callback item-right-clicked(string);
+    callback add_item_clicked(string); // package_id
     callback panel-closed();
 
     // --- The pill dock (right side) ---
