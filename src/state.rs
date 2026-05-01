@@ -9,11 +9,19 @@ pub struct AppState {
 
 impl AppState {
     pub fn new() -> Self {
-        Self {
-            config: ClutchConfig::load(),
+        let config = ClutchConfig::load();
+        let mut state = Self {
+            config,
             expanded_package: None,
             hovered_package: None,
+        };
+        
+        // Add a sample package if empty so the user sees something
+        if state.config.packages.is_empty() {
+            state.add_package("General".to_string(), "#A8E6A3".to_string());
         }
+        
+        state
     }
 
     pub fn add_package(&mut self, name: String, color: String) -> String {

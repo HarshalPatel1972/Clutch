@@ -149,7 +149,35 @@ fn main() {
     
     // Trap 3: Setup window AFTER show
     if let Some(hwnd) = get_hwnd(&window) {
-        window::setup_window(hwnd);
+        let state_drop = state.clone();
+        let window_weak = window.as_weak();
+        
+        window::setup_window(hwnd, Box::new(move |files| {
+            let mut state = state_drop.lock().unwrap();
+            
+            // If a package is expanded, add items to it
+            if let Some(pkg_id) = state.expanded_package.clone() {
+                for file_path in files {
+                    state.add_item_to_package(&pkg_id, file_path);
+                }
+                
+                if let Some(window) = window_weak.upgrade() {
+                    refresh_packages_and_panel(&window, &state);
+                }
+            } else {
+                // TODO: Determine which package was hovered during drop
+                // For now, if not expanded, maybe add to first package?
+                if let Some(pkg) = state.config.packages.first().cloned() {
+                    let pkg_id = pkg.id;
+                    for file_path in files {
+                        state.add_item_to_package(&pkg_id, file_path);
+                    }
+                    if let Some(window) = window_weak.upgrade() {
+                        refresh_packages_and_panel(&window, &state);
+                    }
+                }
+            }
+        }));
     }
 
     // Initialize Polish bits
